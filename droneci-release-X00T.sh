@@ -148,7 +148,7 @@ clone() {
 	if [ $COMPILER = "clang" ]
 	then
 		msg "|| Cloning PROTON clang ||"
-		git clone --depth=1 https://github.com/kdrag0n/proton-clang.git master
+		git clone --depth=1 https://github.com/kdrag0n/proton-clang.git clang
 
 		# Toolchain Directory defaults to clang
 		TC_DIR=$KERNEL_DIR/clang
