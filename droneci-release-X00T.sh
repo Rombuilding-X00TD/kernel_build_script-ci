@@ -155,7 +155,7 @@ clone() {
 	fi
 
 	msg "|| Cloning Anykernel for X00T ||"
-	git clone --depth 1 https://github.com/Rombuilding-X00TD/AnyKernel3-master.git -b master
+	git clone --depth 1 https://github.com/Rombuilding-X00TD/AnyKernel3-master.git -b master Anykernel3
 
 	if [ $BUILD_DTBO = 1 ]
 	then
