@@ -74,7 +74,7 @@ COMPILER=clang
 	if [ $COMPILER = "clang" ]
 	then
 		# install few necessary packages
-		apt-get -y install llvm lld
+		apt-get -y install llvm lld gcc-aarch64-linux-gnu
 	fi
 
 # Clean source prior building. 1 is NO(default) | 0 is YES
