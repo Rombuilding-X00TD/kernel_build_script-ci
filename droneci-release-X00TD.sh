@@ -48,17 +48,17 @@ MODEL="Max Pro M1"
 DEVICE="X00T"
 
 # Kernel revision
-KERNELTYPE=HMP
+KERNELTYPE=EAS
 
 # The defconfig which should be used. Get it from config.gz from
 # your device or check source
-DEFCONFIG=X00T_defconfig
+DEFCONFIG=X00TD_defconfig
 
 # Show manufacturer info
 MANUFACTURERINFO="ASUSTek Computer Inc."
 
 # Kernel revision
-KERNELTYPE=HMP
+KERNELTYPE=EAS
 KERNELRELEASE=stable
 
 # List the kernel version of each device
@@ -74,7 +74,7 @@ COMPILER=clang
 	if [ $COMPILER = "clang" ]
 	then
 		# install few necessary packages
-		apt-get -y install llvm lld gcc-aarch64-linux-gnu
+		apt-get -y install llvm lld 
 	fi
 
 # Clean source prior building. 1 is NO(default) | 0 is YES
@@ -147,8 +147,8 @@ clone() {
 	echo " "
 	if [ $COMPILER = "clang" ]
 	then
-		msg "|| Cloning PROTON clang ||"
-		git clone --depth=1 https://github.com/kdrag0n/proton-clang clang
+		msg "|| Cloning Snapdragon clang ||"
+		git clone --depth=1 https://github.com/pkm774/android-kernel-tools clang
 
 		# Toolchain Directory defaults to clang
 		TC_DIR=$KERNEL_DIR/clang
