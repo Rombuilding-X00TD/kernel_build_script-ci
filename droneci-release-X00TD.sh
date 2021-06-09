@@ -48,7 +48,7 @@ MODEL="Max Pro M1"
 DEVICE="X00T"
 
 # Kernel revision
-KERNELTYPE=HMP
+KERNELTYPE=HMP-OC
 
 # The defconfig which should be used. Get it from config.gz from
 # your device or check source
@@ -58,7 +58,7 @@ DEFCONFIG=X00TD_defconfig
 MANUFACTURERINFO="ASUSTek Computer Inc."
 
 # Kernel revision
-KERNELTYPE=HMP
+KERNELTYPE=HMP-OC
 KERNELRELEASE=stable
 
 # List the kernel version of each device
