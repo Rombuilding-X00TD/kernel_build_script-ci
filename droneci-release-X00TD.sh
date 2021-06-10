@@ -48,7 +48,7 @@ MODEL="Max Pro M1"
 DEVICE="X00T"
 
 # Kernel revision
-KERNELTYPE=EAS-OC
+KERNELTYPE=HMP-OC
 
 # The defconfig which should be used. Get it from config.gz from
 # your device or check source
@@ -58,11 +58,11 @@ DEFCONFIG=X00T_defconfig
 MANUFACTURERINFO="ASUSTek Computer Inc."
 
 # Kernel revision
-KERNELTYPE=EAS-OC
+KERNELTYPE=HMP-OC
 KERNELRELEASE=stable
 
 # List the kernel version of each device
-VERSION="GE"
+VERSION="RAKEN"
 
 # Retrieves branch information
 CI_BRANCH=$(git rev-parse --abbrev-ref HEAD)
