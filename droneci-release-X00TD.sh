@@ -45,7 +45,7 @@ TYPE="stable"
 MODEL="Max Pro M1"
 
 # The codename of the device
-DEVICE="X00T"
+DEVICE="X00TD"
 
 # Kernel revision
 KERNELTYPE=HMP-OC
