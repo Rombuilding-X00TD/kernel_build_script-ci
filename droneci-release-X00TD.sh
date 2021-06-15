@@ -62,7 +62,7 @@ KERNELTYPE=HMP-OC
 KERNELRELEASE=stable
 
 # List the kernel version of each device
-VERSION="RAKEN"
+VERSION="CAF-LTO"
 
 # Retrieves branch information
 CI_BRANCH=$(git rev-parse --abbrev-ref HEAD)
