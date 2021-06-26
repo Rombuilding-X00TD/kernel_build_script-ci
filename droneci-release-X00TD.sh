@@ -39,7 +39,7 @@ KERNEL_DIR=$PWD
 KERNEL="Kryptonite"
 
 # Kernel zip name type
-TYPE="ƦƛƘЄƝ"
+TYPE="CAF-LTO"
 
 # The name of the device for which the kernel is built
 MODEL="Max Pro M1"
