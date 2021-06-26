@@ -39,7 +39,7 @@ KERNEL_DIR=$PWD
 KERNEL="Kryptonite"
 
 # Kernel zip name type
-TYPE="stable"
+TYPE="ƦƛƘЄƝ"
 
 # The name of the device for which the kernel is built
 MODEL="Max Pro M1"
@@ -52,7 +52,7 @@ KERNELTYPE=HMP-OC
 
 # The defconfig which should be used. Get it from config.gz from
 # your device or check source
-DEFCONFIG=X00TD_defconfig
+DEFCONFIG=krypt_defconfig
 
 # Show manufacturer info
 MANUFACTURERINFO="ASUSTek Computer Inc."
