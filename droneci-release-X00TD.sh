@@ -52,14 +52,14 @@ KERNELTYPE=HMP-OC
 
 # The defconfig which should be used. Get it from config.gz from
 # your device or check source
-DEFCONFIG=krypt_defconfig
+DEFCONFIG=X00TD_defconfig
 
 # Show manufacturer info
 MANUFACTURERINFO="ASUSTek Computer Inc."
 
 # Kernel revision
 KERNELTYPE=HMP-OC
-KERNELRELEASE=stable
+KERNELRELEASE=STABLE
 
 # List the kernel version of each device
 VERSION="CAF-LTO"
