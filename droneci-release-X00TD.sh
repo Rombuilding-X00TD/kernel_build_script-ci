@@ -39,7 +39,7 @@ KERNEL_DIR=$PWD
 KERNEL="Kryptonite"
 
 # Kernel zip name type
-TYPE="CAF-LTO"
+TYPE="CAF-OC"
 
 # The name of the device for which the kernel is built
 MODEL="Max Pro M1"
@@ -52,7 +52,7 @@ KERNELTYPE=HMP-OC
 
 # The defconfig which should be used. Get it from config.gz from
 # your device or check source
-DEFCONFIG=X00T_defconfig
+DEFCONFIG=X00TD_defconfig
 
 # Show manufacturer info
 MANUFACTURERINFO="ASUSTek Computer Inc."
@@ -62,7 +62,7 @@ KERNELTYPE=HMP-OC
 KERNELRELEASE=STABLE
 
 # List the kernel version of each device
-VERSION="CAF-LTO"
+VERSION="CAF-OC"
 
 # Retrieves branch information
 CI_BRANCH=$(git rev-parse --abbrev-ref HEAD)
