@@ -38,9 +38,6 @@ KERNEL_DIR=$PWD
 # The name of the Kernel, to name the ZIP
 KERNEL="Kryptonite"
 
-# Kernel zip name type
-TYPE="HMP-OC"
-
 # The name of the device for which the kernel is built
 MODEL="Max Pro M1"
 
@@ -91,7 +88,7 @@ BUILD_DTBO=0
 
 # Sign the zipfile
 # 1 is YES | 0 is NO
-SIGN=0
+SIGN=1
 
 # Debug purpose. Send logs on every successfull builds
 # 1 is YES | 0 is NO(default)
