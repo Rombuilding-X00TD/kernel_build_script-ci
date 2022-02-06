@@ -80,7 +80,7 @@ PTTG=1
 	fi
 
 # Generate a full DEFCONFIG prior building. 1 is YES | 0 is NO(default)
-DEF_REG=0
+DEF_REG=1
 
 # Build dtbo.img (select this only if your source has support to building dtbo.img)
 # 1 is YES | 0 is NO(default)
