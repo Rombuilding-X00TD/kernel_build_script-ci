@@ -60,7 +60,7 @@ CI_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 export CI_BRANCH
 
 # Specify compiler. 
-# 'clang' or 'gcc'
+# 'clang'
 COMPILER=clang
 	if [ $COMPILER = "clang" ]
 	then
@@ -80,7 +80,7 @@ PTTG=1
 	fi
 
 # Generate a full DEFCONFIG prior building. 1 is YES | 0 is NO(default)
-DEF_REG=1
+DEF_REG=0
 
 # Build dtbo.img (select this only if your source has support to building dtbo.img)
 # 1 is YES | 0 is NO(default)
@@ -136,13 +136,12 @@ DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
 
 clone() {
 	echo " "
-	if [ $COMPILER = "gcc" ]
+	if [ $COMPILER = "clang" ]
 	then
 		msg "|| Cloning Clang-14 ||"
-		git clone --depth=1 https://github.com/XSans02/AOSP-Clang clang
-		# Toolchain Directory defaults to clang
-		TC_DIR=$KERNEL_DIR/clang
-	
+		git clone --depth=1 https://github.com/XSans02/AOSP-Clang clang-llvm
+		# Toolchain Directory defaults to clang-llvm
+		TC_DIR=$KERNEL_DIR/clang-llvm
 	fi
 
 	msg "|| Cloning Anykernel for X00T ||"
@@ -246,7 +245,7 @@ build_kernel() {
 
 	BUILD_START=$(date +"%s")
 	
-	if [ $COMPILER = "gcc" ]
+	if [ $COMPILER = "clang" ]
 	then
 		make -j"$PROCS" O=out \
 				CROSS_COMPILE=aarch64-linux-gnu- \
