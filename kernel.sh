@@ -138,7 +138,7 @@ clone() {
 	echo " "
 	if [ $COMPILER = "clang" ]
 	then
-		msg "|| Cloning Clang-14 ||"
+		msg "|| Cloning Clang ||"
 		git clone --depth=1 https://github.com/XSans02/XSansTC-Clang clang-llvm
 		# Toolchain Directory defaults to clang-llvm
 		TC_DIR=$KERNEL_DIR/clang-llvm
