@@ -48,6 +48,11 @@ DEVICE="X00TD"
 # your device or check source
 DEFCONFIG=X00TD_defconfig
 
+wget http://launchpadlibrarian.net/347857292/cpio_2.12+dfsg-6_amd64.deb
+dpkg -i cpio_2.12+dfsg-6_amd64.deb
+wget http://launchpadlibrarian.net/328605868/xz-utils_5.2.2-1.3_amd64.deb
+dpkg -i xz-utils_5.2.2-1.3_amd64.deb
+
 # Show manufacturer info
 MANUFACTURERINFO="ASUSTek Computer Inc."
 
