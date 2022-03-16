@@ -1,4 +1,4 @@
-/bin/bash
+#! /bin/bash
 
  # Script For Building Android arm64 Kernel
  #
@@ -36,10 +36,7 @@ err() {
 KERNEL_DIR=$PWD
 
 # The name of the Kernel, to name the ZIP
-KERNEL="halium"
-
-# Kernel zip name type
-TYPE="stable"
+KERNEL="Kryptonite"
 
 # The name of the device for which the kernel is built
 MODEL="Max Pro M1"
@@ -47,28 +44,21 @@ MODEL="Max Pro M1"
 # The codename of the device
 DEVICE="X00TD"
 
-# Kernel revision
-KERNELTYPE=normal
-
 # The defconfig which should be used. Get it from config.gz from
 # your device or check source
 DEFCONFIG=X00TD_defconfig
-
-cat /etc/os-release
 
 wget http://launchpadlibrarian.net/347857292/cpio_2.12+dfsg-6_amd64.deb
 dpkg -i cpio_2.12+dfsg-6_amd64.deb
 wget http://launchpadlibrarian.net/328605868/xz-utils_5.2.2-1.3_amd64.deb
 dpkg -i xz-utils_5.2.2-1.3_amd64.deb
+
 # Show manufacturer info
 MANUFACTURERINFO="ASUSTek Computer Inc."
 
 # Kernel revision
-KERNELTYPE=normal
-KERNELRELEASE=stable
-
-# List the kernel version of each device
-VERSION="GE"
+KERNELTYPE=EAS
+KERNELRELEASE=STABLE
 
 # Retrieves branch information
 CI_BRANCH=$(git rev-parse --abbrev-ref HEAD)
@@ -80,7 +70,7 @@ COMPILER=clang
 	if [ $COMPILER = "clang" ]
 	then
 		# install few necessary packages
-		apt-get -y install llvm lld gcc-arm-linux-gnueabi gcc-aarch64-linux-gnu clang android-tools-mkbootimg bc bison build-essential ca-certificates curl flex git kmod libssl-dev libtinfo5 python2 sudo unzip wget xz-utils
+		apt-get -y install llvm lld gcc-arm-linux-gnueabi gcc-aarch64-linux-gnu
 	fi
 
 # Clean source prior building. 1 is NO(default) | 0 is YES
@@ -103,7 +93,7 @@ BUILD_DTBO=0
 
 # Sign the zipfile
 # 1 is YES | 0 is NO
-SIGN=0
+SIGN=1
 
 # Debug purpose. Send logs on every successfull builds
 # 1 is YES | 0 is NO(default)
@@ -153,13 +143,10 @@ clone() {
 	echo " "
 	if [ $COMPILER = "clang" ]
 	then
-		msg "|| Cloning GCC 4.9 baremetal ||"
-		git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 -b pie-gsi --depth 1 gcc64
-		git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b pie-gsi --depth 1 gcc32
-		git clone https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 -b android10-gsi --depth 1 
-		CLANG_PATH="$KERNEL_DIR/linux-x86/clang-r353983c"
-		GCC64_DIR=$KERNEL_DIR/gcc64
-		GCC32_DIR=$KERNEL_DIR/gcc32
+		msg "|| Cloning Clang ||"
+		git clone --depth=1 https://github.com/STRK-ND/Kryp-Clang.git clang-llvm
+		# Toolchain Directory defaults to clang-llvm
+		TC_DIR=$KERNEL_DIR/clang-llvm
 	fi
 
 	msg "|| Cloning Anykernel for X00T ||"
@@ -175,16 +162,15 @@ clone() {
 ##------------------------------------------------------##
 
 exports() {
-	export KBUILD_BUILD_USER="iMe"
+	export KBUILD_BUILD_USER="Rajat"
 	export ARCH=arm64
 	export SUBARCH=arm64
 
 	if [ $COMPILER = "clang" ]
 	then
-		echo 'Compiling with clang !'
-		KBUILD_COMPILER_STRING=$("$CLANG_PATH"/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
-		PATH=$GCC64_DIR/bin/:$GCC32_DIR/bin/:$CLANG_PATH/bin:/usr/bin:$PATH
-
+		echo 'Compiling with Clang !'
+		KBUILD_COMPILER_STRING=$("$TC_DIR"/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
+		PATH=$TC_DIR/bin/:$PATH
 	fi
 
 	export PATH KBUILD_COMPILER_STRING
@@ -266,13 +252,13 @@ build_kernel() {
 	
 	if [ $COMPILER = "clang" ]
 	then
-            export CROSS_COMPILE=$KERNEL_DIR/gcc64/bin/aarch64-linux-android-
-	  export CROSS_COMPILE_ARM32=$KERNEL_DIR/gcc32/bin/arm-linux-androideabi-
-            make -j"$PROCS" O=out \
-	          CC=clang \
-	          CLANG_TRIPLE=aarch64-linux-gnu- \
-		CROSS_COMPILE=aarch64-linux-android- \
-		CROSS_COMPILE_ARM32=arm-linux-androideabi-
+		make -j"$PROCS" O=out \
+				CROSS_COMPILE=aarch64-linux-gnu- \
+				CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
+				CC=clang \
+				AR=llvm-ar \
+				OBJDUMP=llvm-objdump \
+				STRIP=llvm-strip
 	fi
 
 
@@ -296,10 +282,12 @@ build_kernel() {
 		python2 "$KERNEL_DIR/scripts/ufdt/libufdt/utils/src/mkdtboimg.py" \
 			create "$KERNEL_DIR/out/arch/arm64/boot/dtbo.img" --page_size=4096 "$KERNEL_DIR/out/arch/arm64/boot/dts/qcom/sm6150-idp-overlay.dtbo"
 	fi
+}
 
-        echo "sec-cess"
+##--------------------------------------------------------------##
 
-        msg "|| Zipping into a flashable zip ||"
+gen_zip() {
+	msg "|| Zipping into a flashable zip ||"
 	 cp "$KERNEL_DIR"/out/arch/arm64/boot/Image.gz-dtb Anykernel3/
 	if [ $BUILD_DTBO = 1 ]
 	then
@@ -316,14 +304,6 @@ build_kernel() {
 		tg_post_build "$ZIP_FINAL" "$CHATID" "Build took : $((DIFF / 60)) minute(s) and $((DIFF % 60)) second(s)"
 	fi
 	cd ..
-
-}
-
-##--------------------------------------------------------------##
-echo "all"
-gen_zip() {
-echo "genzip"
-	
 }
 
 setversioning
