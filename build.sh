@@ -39,7 +39,7 @@ KERNEL_DIR=$PWD
 KERNEL="Kryptonite"
 
 # Kernel zip name type
-TYPE="stable"
+TYPE="STOCK"
 
 # The name of the device for which the kernel is built
 MODEL="Max Pro M1"
@@ -59,7 +59,7 @@ MANUFACTURERINFO="ASUSTek Computer Inc."
 
 # Kernel revision
 KERNELTYPE=HMP
-KERNELRELEASE=stable
+KERNELRELEASE=STOCK
 
 # List the kernel version of each device
 VERSION="STOCK"
