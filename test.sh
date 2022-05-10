@@ -144,7 +144,7 @@ clone() {
 	if [ $COMPILER = "clang" ]
 	then
 		msg "|| Cloning toolchain ||"
-		git clone --depth=1 https://github.com/Thoreck-project/DragonTC -b 10.0 clang
+		git clone --depth=1 https://gitlab.com/STRK-ND/aosp-clang -b main clang
 		msg "|| Cloning GCC 64  ||"
 		git clone --depth=1 https://github.com/Thoreck-project/aarch64-linux-gnu-1 -b stable-gcc gcc64
 		msg "|| Cloning GCC 32  ||"
@@ -262,6 +262,7 @@ build_kernel() {
 	then
 		make -j"$PROCS"  O=out \
 					CC=clang \
+					CLANG_TRIPLE=aarch64-linux-gnu- \
 					CROSS_COMPILE=aarch64-linux-gnu- \
 					CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
 					AR=llvm-ar \
