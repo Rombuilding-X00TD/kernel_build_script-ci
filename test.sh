@@ -153,8 +153,8 @@ clone() {
 		TC_DIR=$KERNEL_DIR/clang
 
 	        # GCC Directory
-		GCC64_DIR=$KERNEL_DIR/binutils
-		GCC32_DIR=$KERNEL_DIR/binutils-32
+		GCC64_DIR=$KERNEL_DIR/binutils/bin
+		GCC32_DIR=$KERNEL_DIR/binutils-32/bin
 	fi
 
 	msg "|| Cloning Anykernel for X00T ||"
