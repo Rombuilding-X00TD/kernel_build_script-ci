@@ -143,10 +143,18 @@ clone() {
 	echo " "
 	if [ $COMPILER = "clang" ]
 	then
-		msg "|| Cloning Clang ||"
-		git clone --depth=1 https://github.com/STRK-ND/Kryp-Clang.git clang-llvm
+		msg "|| Cloning toolchain ||"
+		git clone --depth=1 https://github.com/Thoreck-project/DragonTC -b 10.0 clang
+		msg "|| Cloning GCC 64  ||"
+		git clone --depth=1 https://github.com/Thoreck-project/aarch64-linux-gnu-1 -b stable-gcc gcc64
+		msg "|| Cloning GCC 32  ||"
+		git clone --depth=1 https://github.com/Thoreck-project/arm-linux-gnueabi -b stable-gcc gcc32
 		# Toolchain Directory defaults to clang-llvm
-		TC_DIR=$KERNEL_DIR/clang-llvm
+		TC_DIR=$KERNEL_DIR/clang
+
+	        # GCC Directory
+		GCC64_DIR=$KERNEL_DIR/gcc64
+		GCC32_DIR=$KERNEL_DIR/gcc32
 	fi
 
 	msg "|| Cloning Anykernel for X00T ||"
@@ -170,7 +178,7 @@ exports() {
 	then
 		echo 'Compiling with Clang !'
 		KBUILD_COMPILER_STRING=$("$TC_DIR"/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
-		PATH=$TC_DIR/bin/:$PATH
+		PATH=$TC_DIR/bin:$GCC64_DIR/bin:$GCC32_DIR/bin:/usr/bin:$PATH
 	fi
 
 	export PATH KBUILD_COMPILER_STRING
@@ -252,13 +260,16 @@ build_kernel() {
 	
 	if [ $COMPILER = "clang" ]
 	then
-		make -j"$PROCS" O=out \
-				CROSS_COMPILE=aarch64-linux-gnu- \
-				CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-				CC=clang \
-				AR=llvm-ar \
-				OBJDUMP=llvm-objdump \
-				STRIP=llvm-strip
+		make -j"$PROCS"  O=out \
+					CC=clang \
+					CROSS_COMPILE=aarch64-linux-gnu- \
+					CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
+					AR=llvm-ar \
+                                        NM=llvm-nm \
+                                        OBJCOPY=llvm-objcopy \
+                                        OBJDUMP=llvm-objdump \
+                                        CLANG_TRIPLE=aarch64-linux-gnu- \
+				        STRIP=llvm-strip                
 	fi
 
 
