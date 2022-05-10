@@ -145,16 +145,16 @@ clone() {
 	then
 		msg "|| Cloning toolchain ||"
 		git clone --depth=1 https://gitlab.com/STRK-ND/aosp-clang -b main clang
-		msg "|| Cloning GCC 64  ||"
-		git clone --depth=1 https://github.com/Thoreck-project/aarch64-linux-gnu-1 -b stable-gcc gcc64
-		msg "|| Cloning GCC 32  ||"
-		git clone --depth=1 https://github.com/Thoreck-project/arm-linux-gnueabi -b stable-gcc gcc32
+		msg "|| binutils  ||"
+		git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 -b android11-release binutils
+		msg "|| binutils-32  ||"
+		git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android11-release binutils-32
 		# Toolchain Directory defaults to clang-llvm
 		TC_DIR=$KERNEL_DIR/clang
 
 	        # GCC Directory
-		GCC64_DIR=$KERNEL_DIR/gcc64
-		GCC32_DIR=$KERNEL_DIR/gcc32
+		GCC64_DIR=$KERNEL_DIR/binutils
+		GCC32_DIR=$KERNEL_DIR/binutils-32
 	fi
 
 	msg "|| Cloning Anykernel for X00T ||"
