@@ -258,7 +258,7 @@ build_kernel() {
 	then
 		make -j"$PROCS"  O=out \
 					CC=clang \
-					CROSS_COMPILE=$GCC_DIR/bin/aarch64-linux-android- \
+					CROSS_COMPILE=aarch64-linux-android- \
 					CLANG_TRIPLE=aarch64-linux-gnu- \
 					CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
 					AR=llvm-ar \
