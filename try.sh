@@ -150,11 +150,7 @@ clone() {
 		msg "|| binutils-32  ||"
 		git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android11-release binutils-32
 		# Toolchain Directory defaults to clang-llvm
-		TC_DIR=$KERNEL_DIR/clang
-
-	        # GCC Directory
-		GCC64_DIR=$KERNEL_DIR/binutils/bin
-		GCC32_DIR=$KERNEL_DIR/binutils-32/bin
+		export GCC_DIR=$KERNEL_DIR/binutils
 	fi
 
 	msg "|| Cloning Anykernel for X00T ||"
@@ -178,7 +174,7 @@ exports() {
 	then
 		echo 'Compiling with Clang !'
 		KBUILD_COMPILER_STRING=$("$TC_DIR"/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
-		PATH=$TC_DIR/bin:$GCC64_DIR/bin:$GCC32_DIR/bin:/usr/bin:$PATH
+		PATH=$TC_DIR/bin/:$PATH
 	fi
 
 	export PATH KBUILD_COMPILER_STRING
@@ -262,8 +258,8 @@ build_kernel() {
 	then
 		make -j"$PROCS"  O=out \
 					CC=clang \
+					CROSS_COMPILE=$GCC_DIR/bin/aarch64-linux-android- \
 					CLANG_TRIPLE=aarch64-linux-gnu- \
-					CROSS_COMPILE=aarch64-linux-gnu- \
 					CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
 					AR=llvm-ar \
                                         NM=llvm-nm \
