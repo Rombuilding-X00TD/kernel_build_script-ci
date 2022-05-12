@@ -1,4 +1,4 @@
-/bin/bash
+#!/bin/bash
 
  # Script For Building Android arm64 Kernel
  #
@@ -157,7 +157,7 @@ clone() {
 		git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 -b android11-release --depth 1 gcc64
 		git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android11-release --depth 1 gcc32
 		git clone https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 -b android11-release --depth 1 
-		CLANG_PATH="$KERNEL_DIR/linux-x86/clang-r383902"
+		CLANG_PATH="$KERNEL_DIR/linux-x86/clang-r383902/bin"
 		GCC64_DIR=$KERNEL_DIR/gcc64
 		GCC32_DIR=$KERNEL_DIR/gcc32
 	fi
