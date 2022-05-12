@@ -33,7 +33,10 @@ err() {
 ##----------Basic Informations, COMPULSORY--------------##
 
 # The defult directory where the kernel should be placed
-KERNEL_DIR=$PWD
+KERNEL_DIR="$WORK/kernel-msm"
+WORK="$HOME/work"
+mkdir -p "$WORK"
+cd "$WORK"
 
 # The name of the Kernel, to name the ZIP
 KERNEL="Kryptonite"
@@ -146,13 +149,10 @@ clone() {
 		msg "|| Cloning toolchain ||"
 		git clone --depth=1 https://gitlab.com/STRK-ND/aosp-clang -b main clang-llvm
 		msg "|| binutils  ||"
-		git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 -b android11-release gcc64
+		git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 -b android11-release binutils
 		msg "|| binutils-32  ||"
-		git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android11-release gcc32
-		# Toolchain Directory defaults to clang-llvm
-                CLANG_PATH=$KERNEL_DIR/clang-llvm
-		GCC64_DIR=$KERNEL_DIR/gcc64
-		GCC32_DIR=$KERNEL_DIR/gcc32
+		git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android11-release binutils-32
+
 	fi
 
 	msg "|| Cloning Anykernel for X00T ||"
@@ -175,8 +175,7 @@ exports() {
 	if [ $COMPILER = "clang" ]
 	then
 		echo 'Compiling with Clang !'
-		KBUILD_COMPILER_STRING=$("$CLANG_PATH"/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
-		PATH=$GCC64_DIR/bin/:$GCC32_DIR/bin/:$CLANG_PATH/bin:/usr/bin:$PATH
+		PATH="$WORK/clang/bin:$WORK/binutils/bin:$WORK/binutils-32/bin:/bin"
 	fi
 
 	export PATH KBUILD_COMPILER_STRING
@@ -258,14 +257,12 @@ build_kernel() {
 	
 	if [ $COMPILER = "clang" ]
 	then
-	export CROSS_COMPILE=$KERNEL_DIR/gcc64/bin/aarch64-linux-android-
-	export CROSS_COMPILE_ARM32=$KERNEL_DIR/gcc32/bin/arm-linux-androideabi-
 		make -j"$PROCS"  O=out \
-					O=out \
-	                                CC=clang \
-	                                CLANG_TRIPLE=aarch64-linux-gnu- \
-		                        CROSS_COMPILE=aarch64-linux-android- \
-		                        CROSS_COMPILE_ARM32=arm-linux-androideabi-                
+                                 CC=clang \
+                                 HOSTCC=clang \
+                                 CLANG_TRIPLE=aarch64-linux-gnu- \
+                                 CROSS_COMPILE=aarch64-linux-android- \
+                                 CROSS_COMPILE_ARM32=arm-linux-androideabi- \               
 	fi
 
 
