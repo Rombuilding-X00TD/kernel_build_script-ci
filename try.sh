@@ -150,7 +150,8 @@ clone() {
 		msg "|| binutils-32  ||"
 		git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android11-release binutils-32
 		# Toolchain Directory defaults to clang-llvm
-		export GCC_DIR=$KERNEL_DIR/binutils
+		GCC64_DIR=$KERNEL_DIR/binutils
+                GCC32_DIR=$KERNEL_DIR/binutils-32
 	fi
 
 	msg "|| Cloning Anykernel for X00T ||"
