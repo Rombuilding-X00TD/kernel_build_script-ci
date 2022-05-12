@@ -144,14 +144,15 @@ clone() {
 	if [ $COMPILER = "clang" ]
 	then
 		msg "|| Cloning toolchain ||"
-		git clone --depth=1 https://gitlab.com/STRK-ND/aosp-clang -b main clang
+		git clone --depth=1 https://gitlab.com/STRK-ND/aosp-clang -b main clang-llvm
 		msg "|| binutils  ||"
-		git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 -b android11-release binutils
+		git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 -b android11-release gcc64
 		msg "|| binutils-32  ||"
-		git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android11-release binutils-32
+		git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android11-release gcc32
 		# Toolchain Directory defaults to clang-llvm
-		GCC64_DIR=$KERNEL_DIR/binutils
-                GCC32_DIR=$KERNEL_DIR/binutils-32
+                CLANG_PATH=$KERNEL_DIR/clang-llvm
+		GCC64_DIR=$KERNEL_DIR/gcc64
+		GCC32_DIR=$KERNEL_DIR/gcc32
 	fi
 
 	msg "|| Cloning Anykernel for X00T ||"
@@ -174,8 +175,8 @@ exports() {
 	if [ $COMPILER = "clang" ]
 	then
 		echo 'Compiling with Clang !'
-		KBUILD_COMPILER_STRING=$("$TC_DIR"/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
-		PATH=$TC_DIR/bin:$GCC64_DIR/bin:$GCC32_DIR/bin:/usr/bin:$PATH
+		KBUILD_COMPILER_STRING=$("$CLANG_PATH"/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
+		PATH=$GCC64_DIR/bin/:$GCC32_DIR/bin/:$CLANG_PATH/bin:/usr/bin:$PATH
 	fi
 
 	export PATH KBUILD_COMPILER_STRING
@@ -257,17 +258,14 @@ build_kernel() {
 	
 	if [ $COMPILER = "clang" ]
 	then
+	export CROSS_COMPILE=$KERNEL_DIR/gcc64/bin/aarch64-linux-android-
+	export CROSS_COMPILE_ARM32=$KERNEL_DIR/gcc32/bin/arm-linux-androideabi-
 		make -j"$PROCS"  O=out \
-					CC=clang \
-					CROSS_COMPILE=aarch64-linux-android- \
-					CLANG_TRIPLE=aarch64-linux-gnu- \
-					CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-					AR=llvm-ar \
-                                        NM=llvm-nm \
-                                        OBJCOPY=llvm-objcopy \
-                                        OBJDUMP=llvm-objdump \
-                                        CLANG_TRIPLE=aarch64-linux-gnu- \
-				        STRIP=llvm-strip                
+					O=out \
+	                                CC=clang \
+	                                CLANG_TRIPLE=aarch64-linux-gnu- \
+		                        CROSS_COMPILE=aarch64-linux-android- \
+		                        CROSS_COMPILE_ARM32=arm-linux-androideabi-                
 	fi
 
 
