@@ -62,11 +62,6 @@ export CI_BRANCH
 # Specify compiler. 
 # 'clang' or 'gcc'
 COMPILER=gcc
-	if [ $COMPILER = "gcc" ]
-	then
-		# install few necessary packages
-		apt-get -y install llvm lld gcc-arm-linux-gnueabi gcc-aarch64-linux-gnu
-	fi
 
 # Clean source prior building. 1 is NO(default) | 0 is YES
 INCREMENTAL=1
