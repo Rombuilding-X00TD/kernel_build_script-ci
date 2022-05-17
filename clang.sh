@@ -255,7 +255,6 @@ build_kernel() {
 		OBJDUMP=llvm-objdump \
 		STRIP=llvm-strip \
 		OBJCOPY=llvm-objcopy \
-		CLANG_TRIPLE=aarch64-linux-gnu- \
 		CROSS_COMPILE=aarch64-linux-android- \
 		CROSS_COMPILE_ARM32=arm-linux-androideabi-
 	fi
