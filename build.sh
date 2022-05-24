@@ -48,24 +48,24 @@ KERNEL_DIR="$(pwd)"
 BASEDIR="$(basename "$KERNEL_DIR")"
 
 # The name of the Kernel, to name the ZIP
-ZIPNAME="azure"
+ZIPNAME="Kryptonite"
 
 # Build Author
 # Take care, it should be a universal and most probably, case-sensitive
-AUTHOR="Panchajanya1999"
+AUTHOR="STRK-ND"
 
 # Architecture
 ARCH=arm64
 
 # The name of the device for which the kernel is built
-MODEL="Redmi Note 7 Pro"
+MODEL="Max Pro M1"
 
 # The codename of the device
-DEVICE="violet"
+DEVICE="X00TD"
 
 # The defconfig which should be used. Get it from config.gz from
 # your device or check source
-DEFCONFIG=vendor/violet-perf_defconfig
+DEFCONFIG=X00TD_defconfig
 
 # Specify compiler. 
 # 'clang' or 'gcc'
@@ -86,7 +86,7 @@ PTTG=1
 	if [ $PTTG = 1 ]
 	then
 		# Set Telegram Chat ID
-		CHATID="-1001231303646"
+		CHATID="-495751416"
 	fi
 
 # Generate a full DEFCONFIG prior building. 1 is YES | 0 is NO(default)
@@ -144,6 +144,7 @@ KBUILD_BUILD_HOST=$(uname -a | awk '{print $2}')
 CI_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 TERM=xterm
 export KBUILD_BUILD_HOST CI_BRANCH TERM
+export token="1719149477:AAFAPPtfNTHh_byVBhDZ_anDQD-ywukzWRc"
 
 ## Check for CI
 if [ "$CI" ]
