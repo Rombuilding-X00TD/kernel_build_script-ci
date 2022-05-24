@@ -138,7 +138,7 @@ clone() {
 	msg "|| Cloning binutils ||"
 	git clone https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9 --depth=1 --single-branch --branch="lineage-19.0" gcc64
 	git clone https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9 --depth=1 --single-branch --branch="lineage-19.0" gcc32
-	# Toolchain Directory defaults to clang-llvm
+		# Toolchain Directory defaults to clang-llvm
 	TC_DIR=$KERNEL_DIR/clang-llvm
 	GCC64_DIR=$KERNEL_DIR/gcc64
 	GCC32_DIR=$KERNEL_DIR/gcc32
@@ -231,33 +231,30 @@ build_kernel() {
 
 	if [ "$PTTG" = 1 ]
  	then
-		tg_post_msg "<b>Docker OS: </b><code>$DISTRO</code>%0A<b>Kernel Version : </b><code>$KERVER</code>%0A<b>Date : </b><code>$(TZ=Asia/Jakarta date)</code>%0A<b>Device : </b><code>$MODEL [$DEVICE]</code>%0A<b>Manufacturer : </b><code>$MANUFACTURERINFO</code>%0A<b>Pipeline Host : </b><code>$KBUILD_BUILD_HOST</code>%0A<b>Host Core Count : </b><code>$PROCS</code>%0A<b>Compiler Used : </b><code>$KBUILD_COMPILER_STRING</code>%0a<b>Branch : </b><code>$CI_BRANCH</code>%0A<b>Last Commit : </b><code>$COMMIT_HEAD</code>%0A" "$CHATID"
+		tg_post_msg "<b>🔨 $KBUILD_BUILD_VERSION CI Build Triggered</b>%0A<b>Kernel Version : </b><code>$KERVER</code>%0A<b>Date : </b><code>$(TZ=Asia/Jakarta date)</code>%0A<b>Compiler Used : </b><code>$KBUILD_COMPILER_STRING</code>%0a<b>Branch : </b><code>$CI_BRANCH</code>%0A<b>HEAD : </b><a href='$DRONE_COMMIT_LINK'>$COMMIT_HEAD</a>" "$CHATID"
 	fi
 
 	msg "|| Started Compilation ||"
 
-	make O=out $DEFCONFIG
+	make O=out $DEFCONFIG CC=clang
 	if [ $DEF_REG = 1 ]
 	then
 		cp .config arch/arm64/configs/$DEFCONFIG
 		git add arch/arm64/configs/$DEFCONFIG
 		git commit -m "$DEFCONFIG: Regenerate
-					This is an auto-generated commit"
+						This is an auto-generated commit"
 	fi
 
 	BUILD_START=$(date +"%s")
-	
-	if [ $COMPILER = "clang" ]
+
+
+	if [ $SILENCE = "1" ]
 	then
-		make -j"$PROCS" O=out \
-		CC=clang \
-		AR=llvm-ar \
-		OBJDUMP=llvm-objdump \
-		STRIP=llvm-strip \
-		OBJCOPY=llvm-objcopy \
-		CLANG_TRIPLE=aarch64-linux-gnu- \
-	        CROSS_COMPILE=aarch64-linux-android- \
-	        CROSS_COMPILE_ARM32=arm-linux-androideabi-
+		MAKE+=( -s )
+	fi
+
+	msg "|| Started Compilation ||"
+	make -j"$PROCS" O=out CC=clang AR=llvm-ar OBJDUMP=llvm-objdump STRIP=llvm-strip OBJCOPY=llvm-objcopy CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-android- CROSS_COMPILE_ARM32=arm-linux-androideabi-
 	fi
 
 
