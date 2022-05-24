@@ -248,10 +248,9 @@ build_kernel() {
 	BUILD_START=$(date +"%s")
 
 
-	if [ $SILENCE = "1" ]
+	
+	if [ $COMPILER = "clang" ]
 	then
-		MAKE+=( -s )
-	fi
 
 	msg "|| Started Compilation ||"
 	make -j"$PROCS" O=out CC=clang AR=llvm-ar OBJDUMP=llvm-objdump STRIP=llvm-strip OBJCOPY=llvm-objcopy CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-android- CROSS_COMPILE_ARM32=arm-linux-androideabi-
