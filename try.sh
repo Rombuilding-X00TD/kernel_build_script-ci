@@ -134,12 +134,14 @@ clone() {
 	if [ $COMPILER = "aosp" ]
 	then
 		msg "|| Cloning GCC 9.3.0 baremetal ||"
-	mkdir aosp-clang
+	 mkdir aosp-clang
+        cd aosp-clang || exit
 	wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master/clang-r450784b.tar.gz
-        tar -xf clang-r450784b.tar.gz clang*
+        tar -xf clang*
         cd .. || exit
 	git clone https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9.git --depth=1 gcc
 	git clone https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9.git  --depth=1 gcc32
+	PATH="${KERNEL_DIR}/aosp-clang/bin:${KERNEL_DIR}/gcc/bin:${KERNEL_DIR}/gcc32/bin:${PATH}"
 	
 	fi
 
@@ -163,8 +165,7 @@ exports() {
 	if [ $COMPILER = "aosp" ]
 	then
 		echo 'Compiling with aosp !'
-		export KBUILD_COMPILER_STRING=$(${KERNEL_DIR}/clang/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/ */ /g' -e 's/[[:space:]]*$//')
-		PATH="${KERNEL_DIR}/clang/bin:${KERNEL_DIR}/gcc/bin:${KERNEL_DIR}/gcc32/bin:${PATH}"
+		export KBUILD_COMPILER_STRING=$(${KERNEL_DIR}/aosp-clang/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
 	fi
 
 	export PATH KBUILD_COMPILER_STRING
@@ -246,7 +247,7 @@ build_kernel() {
 	
 	if [ $COMPILER = "aosp" ]
 	then
-		make -j"$PROCS" O=out \
+		make -kj$(nproc --all) O=out \
 	       ARCH=arm64 \
 	       CC=clang \
                HOSTCC=clang \
@@ -254,14 +255,14 @@ build_kernel() {
 	       CLANG_TRIPLE=aarch64-linux-gnu- \
 	       CROSS_COMPILE=aarch64-linux-android- \
 	       CROSS_COMPILE_ARM32=arm-linux-androideabi- \
-               LD=${LINKER} \
-               AR=llvm-ar \
-               NM=llvm-nm \
-               OBJCOPY=llvm-objcopy \
-               OBJDUMP=llvm-objdump \
+	       LD=${LINKER} \
+	       AR=llvm-ar \
+	       NM=llvm-nm \
+	       OBJCOPY=llvm-objcopy \
+	       OBJDUMP=llvm-objdump \
                STRIP=llvm-strip \
-               READELF=llvm-readelf \
-               OBJSIZE=llvm-size 
+	       READELF=llvm-readelf \
+	       OBJSIZE=llvm-size
 	fi
 
 
