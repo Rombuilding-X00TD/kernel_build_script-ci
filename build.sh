@@ -63,6 +63,9 @@ MODEL="Max Pro M1"
 # Show manufacturer info
 MANUFACTURERINFO="ASUSTek Computer Inc."
 
+# Kernel revision
+KERNELTYPE=STOCK
+
 # The codename of the device
 DEVICE="X00TD"
 
@@ -367,10 +370,10 @@ gen_zip() {
 		mv "$KERNEL_DIR"/out/arch/arm64/boot/dtbo.img AnyKernel3/dtbo.img
 	fi
 	cdir AnyKernel3
-	zip -r $ZIPNAME-$DEVICE-"$DATE" . -x ".git*" -x "README.md" -x "*.zip"
+	zip -r $ZIPNAME-$DEVICE-$KERNELTYPE-"$DATE" . -x ".git*" -x "README.md" -x "*.zip"
 
 	## Prepare a final zip variable
-	ZIP_FINAL="$ZIPNAME-$DEVICE-$DATE"
+	ZIP_FINAL="$ZIPNAME-$DEVICE-$KERNELTYPE-$DATE"
 
 	if [ $SIGN = 1 ]
 	then
