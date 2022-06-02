@@ -60,6 +60,9 @@ ARCH=arm64
 # The name of the device for which the kernel is built
 MODEL="Max Pro M1"
 
+# Show manufacturer info
+MANUFACTURERINFO="ASUSTek Computer Inc."
+
 # The codename of the device
 DEVICE="X00TD"
 
