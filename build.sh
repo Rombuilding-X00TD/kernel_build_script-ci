@@ -195,9 +195,14 @@ DATE=$(TZ=Asia/Kolkata date +"%Y%m%d-%T")
 	if [ $COMPILER = "clang" ]
 	then
 		msg "|| Cloning Clang-14 ||"
-		git clone --depth=1 https://gitlab.com/Panchajanya1999/azure-clang.git clang-llvm
+		# git clone --depth=1 https://gitlab.com/Panchajanya1999/azure-clang.git clang-llvm
+		git clone --depth=1 https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-r450784.git clang-aosp
+		git clone --depth=1 https://github.com/cbendot/gcc-aarch64.git gcc64
+		git clone --depth=1 https://github.com/cbendot/gcc-armv7.git gcc32
 		# Toolchain Directory defaults to clang-llvm
-		TC_DIR=$KERNEL_DIR/clang-llvm
+		TC_DIR=$KERNEL_DIR/clang-aosp
+		GCC64_DIR=$KERNEL_DIR/gcc64
+		GCC32_DIR=$KERNEL_DIR/gcc32
 	fi
 
 	msg "|| Cloning Anykernel ||"
@@ -219,7 +224,7 @@ exports() {
 	if [ $COMPILER = "clang" ]
 	then
 		KBUILD_COMPILER_STRING=$("$TC_DIR"/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
-		PATH=$TC_DIR/bin/:$PATH
+		PATH=$TC_DIR/bin/:$GCC64_DIR/bin/:$GCC32_DIR/bin/:/usr/bin:$PATH
 	elif [ $COMPILER = "gcc" ]
 	then
 		KBUILD_COMPILER_STRING=$("$GCC64_DIR"/bin/aarch64-elf-gcc --version | head -n 1)
@@ -288,8 +293,9 @@ build_kernel() {
 	if [ $COMPILER = "clang" ]
 	then
 		MAKE+=(
-			CROSS_COMPILE=aarch64-linux-gnu- \
-			CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
+			CROSS_COMPILE=aarch64-buildroot-linux-gnu- \
+			CROSS_COMPILE_ARM32=arm-buildroot-linux-gnueabihf- \
+			CLANG_TRIPLE=aarch64-buildroot-linux-gnu- \
 			CC=clang \
 			AR=llvm-ar \
 			OBJDUMP=llvm-objdump \
