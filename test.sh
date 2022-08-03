@@ -75,7 +75,7 @@ DEFCONFIG=X00TD_defconfig
 
 # Specify compiler. 
 # 'clang' or 'gcc'
-COMPILER=clang
+COMPILER=gcc
 
 # Build modules. 0 = NO | 1 = YES
 MODULES=0
@@ -186,8 +186,8 @@ DATE=$(TZ=Asia/Kolkata date +"%Y%m%d-%T")
 	if [ $COMPILER = "gcc" ]
 	then
 		msg "|| Cloning GCC 9.3.0 baremetal ||"
-		git clone --depth=1 https://github.com/mvaisakh/gcc-arm64.git gcc64
-		git clone --depth=1 https://github.com/arter97/arm32-gcc.git gcc32
+		git clone --depth=1 https://gitlab.com/STRK-ND/aarch64-linux-android-4.9.git gcc64
+		git clone --depth=1 https://gitlab.com/STRK-ND/arm-linux-androideabi-4.9.git gcc32
 		GCC64_DIR=$KERNEL_DIR/gcc64
 		GCC32_DIR=$KERNEL_DIR/gcc32
 	fi
@@ -197,8 +197,8 @@ DATE=$(TZ=Asia/Kolkata date +"%Y%m%d-%T")
 		msg "|| Cloning Clang-14 ||"
 		# git clone --depth=1 https://gitlab.com/Panchajanya1999/azure-clang.git clang-llvm
 		git clone --depth=1 https://gitlab.com/STRK-ND/aosp-clang.git clang-aosp
-		git clone --depth=1 https://gitlab.com/STRK-ND/aarch64-linux-android-4.9.git gcc64
-		git clone --depth=1 https://gitlab.com/STRK-ND/arm-linux-androideabi-4.9.git gcc32
+		git clone --depth=1 https://github.com/cbendot/gcc-aarch64.git gcc64
+		git clone --depth=1 https://github.com/cbendot/gcc-armv7.git gcc32
 		# Toolchain Directory defaults to clang-llvm
 		TC_DIR=$KERNEL_DIR/clang-aosp
 		GCC64_DIR=$KERNEL_DIR/gcc64
@@ -224,7 +224,6 @@ exports() {
 	if [ $COMPILER = "clang" ]
 	then
 		KBUILD_COMPILER_STRING=$("$TC_DIR"/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
-		CLANG_VER="$("$TC_DIR"/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')"
 		PATH=$TC_DIR/bin/:$GCC64_DIR/bin/:$GCC32_DIR/bin/:/usr/bin:$PATH
 	elif [ $COMPILER = "gcc" ]
 	then
@@ -294,11 +293,11 @@ build_kernel() {
 	if [ $COMPILER = "clang" ]
 	then
 		MAKE+=(
-		       CROSS_COMPILE=aarch64-linux-android- \
-                       CROSS_COMPILE_ARM32=arm-linux-androideabi- \
-                       CLANG_TRIPLE=aarch64-linux-gnu- \
-		       CC=clang \
-		       AR=llvm-ar \
+			CROSS_COMPILE=aarch64-buildroot-linux-gnu- \
+			CROSS_COMPILE_ARM32=arm-buildroot-linux-gnueabihf- \
+			CLANG_TRIPLE=aarch64-buildroot-linux-gnu- \
+			CC=clang \
+			AR=llvm-ar \
 			OBJDUMP=llvm-objdump \
 			STRIP=llvm-strip \
 			NM=llvm-nm \
@@ -307,8 +306,8 @@ build_kernel() {
 	elif [ $COMPILER = "gcc" ]
 	then
 		MAKE+=(
-			CROSS_COMPILE_ARM32=arm-eabi- \
-			CROSS_COMPILE=aarch64-elf- \
+			CROSS_COMPILE_ARM32=arm-linux-androideabi- \
+			CROSS_COMPILE=aarch64-linux-android- \
 			AR=aarch64-elf-ar \
 			OBJDUMP=aarch64-elf-objdump \
 			STRIP=aarch64-elf-strip \
