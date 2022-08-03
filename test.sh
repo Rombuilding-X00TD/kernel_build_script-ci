@@ -187,7 +187,7 @@ DATE=$(TZ=Asia/Kolkata date +"%Y%m%d-%T")
 	then
 		msg "|| Cloning GCC baremetal ||"
 		git clone --depth=1 https://github.com/mvaisakh/gcc-arm64.git gcc64
-		git clone --depth=1 https://github.com/mvaisakh/gcc-build.git gcc32
+		git clone --depth=1 https://github.com/mvaisakh/gcc-arm.git gcc32
 		GCC64_DIR=$KERNEL_DIR/gcc64
 		GCC32_DIR=$KERNEL_DIR/gcc32
 	fi
@@ -306,8 +306,12 @@ build_kernel() {
 	elif [ $COMPILER = "gcc" ]
 	then
 		MAKE+=(
-			CROSS_COMPILE_ARM32=arm-eabi- \
-			CROSS_COMPILE=aarch64-elf-
+			CROSS_COMPILE=aarch64-elf- \
+			AR=aarch64-elf-ar \
+			OBJDUMP=aarch64-elf-objdump \
+			STRIP=aarch64-elf-strip \
+			NM=aarch64-elf-nm \
+			OBJCOPY=aarch64-elf-objcopy
 		)
 	fi
 	
