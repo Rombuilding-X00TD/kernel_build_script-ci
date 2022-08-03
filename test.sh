@@ -225,8 +225,6 @@ exports() {
 	then
 		KBUILD_COMPILER_STRING=$("$TC_DIR"/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
 		CLANG_VER="$("$TC_DIR"/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')"
-                LLD_VER="$("$TC_DIR"/bin/ld.lld --version | head -n 1)"
-                export KBUILD_COMPILER_STRING="$CLANG_VER with $LLD_VER"
 		PATH=$TC_DIR/bin/:$GCC64_DIR/bin/:$GCC32_DIR/bin/:/usr/bin:$PATH
 	elif [ $COMPILER = "gcc" ]
 	then
@@ -296,22 +294,15 @@ build_kernel() {
 	if [ $COMPILER = "clang" ]
 	then
 		MAKE+=(
-                       LD_LIBRARY_PATH="${TC_DIR}/lib64:${LD_LIBRARY_PATH}" \
-                       CC=${TC_DIR}/bin/clang \
-                       NM=${TC_DIR}/bin/llvm-nm \
-                       CXX=${TC_DIR}/bin/clang++ \
-                       AR=${TC_DIR}/bin/llvm-ar \
-                       STRIP=${TC_DIR}/bin/llvm-strip \
-                       OBJCOPY=${TC_DIR}/bin/llvm-objcopy \
-                       OBJDUMP=${TC_DIR}/bin/llvm-objdump \
-                       OBJSIZE=${TC_DIR}/bin/llvm-size \
-                       READELF=${TC_DIR}/bin/llvm-readelf \
-                       CROSS_COMPILE=aarch64-linux-android- \
+		       CROSS_COMPILE=aarch64-linux-android- \
                        CROSS_COMPILE_ARM32=arm-linux-androideabi- \
                        CLANG_TRIPLE=aarch64-linux-gnu- \
-                       HOSTAR=${TC_DIR}/bin/llvm-ar \
-                       HOSTCC=${TC_DIR}/bin/clang \
-                       HOSTCXX=${TC_DIR}/bin/clang++
+		       CC=clang \
+		       AR=llvm-ar \
+			OBJDUMP=llvm-objdump \
+			STRIP=llvm-strip \
+			NM=llvm-nm \
+			OBJCOPY=llvm-objcopy 
 		)
 	elif [ $COMPILER = "gcc" ]
 	then
