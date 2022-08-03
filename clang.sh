@@ -197,8 +197,8 @@ DATE=$(TZ=Asia/Kolkata date +"%Y%m%d-%T")
 		msg "|| Cloning Clang-14 ||"
 		# git clone --depth=1 https://gitlab.com/Panchajanya1999/azure-clang.git clang-llvm
 		git clone --depth=1 https://gitlab.com/STRK-ND/aosp-clang.git clang-aosp
-		git clone --depth=1 https://gitlab.com/STRK-ND/aarch64-linux-android-4.9.git gcc64
-		git clone --depth=1 https://gitlab.com/STRK-ND/arm-linux-androideabi-4.9.git gcc32
+		git clone --depth=1 https://github.com/XSans02/aarch64-linux-android-4.9.git gcc64
+		git clone --depth=1 https://github.com/XSans02/arm-linux-androideabi-4.9.git gcc32
 		# Toolchain Directory defaults to clang-llvm
 		TC_DIR=$KERNEL_DIR/clang-aosp
 		GCC64_DIR=$KERNEL_DIR/gcc64
