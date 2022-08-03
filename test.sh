@@ -197,8 +197,8 @@ DATE=$(TZ=Asia/Kolkata date +"%Y%m%d-%T")
 		msg "|| Cloning Clang-14 ||"
 		# git clone --depth=1 https://gitlab.com/Panchajanya1999/azure-clang.git clang-llvm
 		git clone --depth=1 https://gitlab.com/STRK-ND/aosp-clang.git clang-aosp
-		git clone --depth=1 https://github.com/cbendot/gcc-aarch64.git gcc64
-		git clone --depth=1 https://github.com/cbendot/gcc-armv7.git gcc32
+		git clone --depth=1 https://gitlab.com/STRK-ND/aarch64-linux-android-4.9.git gcc64
+		git clone --depth=1 https://gitlab.com/STRK-ND/arm-linux-androideabi-4.9.git gcc32
 		# Toolchain Directory defaults to clang-llvm
 		TC_DIR=$KERNEL_DIR/clang-aosp
 		GCC64_DIR=$KERNEL_DIR/gcc64
@@ -293,15 +293,15 @@ build_kernel() {
 	if [ $COMPILER = "clang" ]
 	then
 		MAKE+=(
-			CROSS_COMPILE=aarch64-buildroot-linux-gnu- \
-			CROSS_COMPILE_ARM32=arm-buildroot-linux-gnueabihf- \
-			CLANG_TRIPLE=aarch64-buildroot-linux-gnu- \
-			CC=clang \
-			AR=llvm-ar \
-			OBJDUMP=llvm-objdump \
-			STRIP=llvm-strip \
-			NM=llvm-nm \
-			OBJCOPY=llvm-objcopy 
+                       CC=clang \
+		       CROSS_COMPILE=aarch64-linux-android- \
+		       CROSS_COMPILE_ARM32=arm-linux-androideabi- \
+		       CLANG_TRIPLE=aarch64-linux-gnu- \
+		       AR=llvm-ar \
+                       NM=llvm-nm \
+                       OBJCOPY=llvm-objcopy \
+                       OBJDUMP=llvm-objdump \
+		       STRIP=llvm-strip
 		)
 	elif [ $COMPILER = "gcc" ]
 	then
