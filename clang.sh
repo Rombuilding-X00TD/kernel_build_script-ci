@@ -64,7 +64,7 @@ MODEL="Max Pro M1"
 MANUFACTURERINFO="ASUSTek Computer Inc."
 
 # Kernel revision
-KERNELTYPE=STOCK
+KERNELTYPE=4.4.x
 
 # The codename of the device
 DEVICE="X00TD"
