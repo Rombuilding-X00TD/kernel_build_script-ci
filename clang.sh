@@ -89,7 +89,7 @@ PTTG=1
 if [ $PTTG = 1 ]
 then
 	# Set Telegram Chat ID
-	CHATID="-100835766019"
+	CHATID="-835766019"
 fi
 
 # Generate a full DEFCONFIG prior building. 1 is YES | 0 is NO(default)
@@ -196,10 +196,15 @@ DATE=$(TZ=Asia/Kolkata date +"%Y%m%d-%T")
 	
 	if [ $COMPILER = "clang" ]
 	then
-		msger -n "|| Cloning Clang-16||"
-		git clone --depth=1 https://gitlab.com/Project-Nexus/nexus-clang.git clang-llvm
+		msg "|| Cloning Clang-14 ||"
+		# git clone --depth=1 https://gitlab.com/Panchajanya1999/azure-clang.git clang-llvm
+		git clone --depth=1 https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+/refs/heads/master -b master clang-aosp
+		git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/+refs -b master gcc64
+		git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/+refs -b master gcc32
 		# Toolchain Directory defaults to clang-llvm
-		TC_DIR=$KERNEL_DIR/clang-llvm
+		TC_DIR=$KERNEL_DIR/clang-aosp
+		GCC64_DIR=$KERNEL_DIR/gcc64
+		GCC32_DIR=$KERNEL_DIR/gcc32
 	fi
 
 	msger -n "|| Cloning Anykernel ||"
@@ -222,7 +227,7 @@ exports()
 	if [ $COMPILER = "clang" ]
 	then
 		KBUILD_COMPILER_STRING=$("$TC_DIR"/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
-		PATH=$TC_DIR/bin/:$PATH
+		PATH=$TC_DIR/bin/:$GCC64_DIR/bin/:$GCC32_DIR/bin/:/usr/bin:$PATH
 	elif [ $COMPILER = "gcc" ]
 	then
 		KBUILD_COMPILER_STRING=$("$GCC64_DIR"/bin/aarch64-elf-gcc --version | head -n 1)
@@ -294,15 +299,22 @@ build_kernel()
 	if [ $COMPILER = "clang" ]
 	then
 		MAKE+=(
-			CROSS_COMPILE=aarch64-linux-gnu- \
-			CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-			CC=clang \
-			AR=llvm-ar \
-			OBJDUMP=llvm-objdump \
-			STRIP=llvm-strip \
-			NM=llvm-nm \
-			OBJCOPY=llvm-objcopy \
-			LD="$LINKER"
+			CROSS_COMPILE="aarch64-linux-android-"
+                        CROSS_COMPILE_ARM32="arm-linux-androideabi-"
+                        CC="clang"
+                        AR="llvm-ar"
+                        AS="llvm-as"
+                        NM="llvm-nm"
+                        LD="aarch64-linux-android-ld"
+                        STRIP="aarch64-linux-android-strip"
+                        OBJCOPY="llvm-objcopy"
+                        OBJDUMP="llvm-objdump"
+                        OBJSIZE="llvm-size"
+                        READELF="aarch64-linux-android-readelf"
+                        HOSTCC="clang"
+                        HOSTCXX="clang++"
+                        HOSTAR="llvm-ar"
+                        CLANG_TRIPLE="aarch64-linux-gnu-"
 		)
 	elif [ $COMPILER = "gcc" ]
 	then
