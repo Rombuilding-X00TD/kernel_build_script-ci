@@ -79,7 +79,7 @@ COMPILER=clang
 	if [ $COMPILER = "clang" ]
 	then
 		# install few necessary packages
-git clone https://github.com/akhilnarang/scripts && cd scripts && bash setup/android_build_env.sh && cd
+rm -rf scripts && git clone https://github.com/akhilnarang/scripts && cd scripts && bash setup/android_build_env.sh && cd
 	fi
 
 # Build modules. 0 = NO | 1 = YES
