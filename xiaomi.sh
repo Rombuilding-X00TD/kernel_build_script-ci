@@ -75,7 +75,7 @@ DEFCONFIG=vendor/lahaina-qgki_defconfig
 
 # Specify compiler. 
 # 'clang' or 'gcc'
-COMPILER=gcc
+COMPILER=clang
 
 # Build modules. 0 = NO | 1 = YES
 MODULES=0
@@ -130,7 +130,7 @@ SILENCE=0
 
 # Verbose build
 # 0 is Quiet(default)) | 1 is verbose | 2 gives reason for rebuilding targets
-VERBOSE=1
+VERBOSE=0
 
 # Debug purpose. Send logs on every successfull builds
 # 1 is YES | 0 is NO(default)
