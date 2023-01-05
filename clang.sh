@@ -183,30 +183,21 @@ COMMIT_HEAD=$(git log --oneline -1)
 # Set Date 
 DATE=$(TZ=Asia/Kolkata date +"%Y%m%d-%T")
 
-#Now Its time for other stuffs like cloning, exporting, etc
+# Now Its time for other stuffs like cloning, exporting, etc
 
- clone() {
+clone() {
 	echo " "
-	if [ $COMPILER = "gcc" ]
+	if [ $COMPILER = "clang" ]
 	then
-		msg "|| Cloning GCC 9.3.0 baremetal ||"
-		git clone --depth=1 https://github.com/mvaisakh/gcc-arm64.git gcc64
-		git clone --depth=1 https://github.com/arter97/arm32-gcc.git gcc32
-		GCC64_DIR=$KERNEL_DIR/gcc64
-		GCC32_DIR=$KERNEL_DIR/gcc32
-	fi
-	
-        if [ $COMPILER = "clang" ]
-	then
-		msger -n "|| Cloning Clang-16||"
-		git clone --depth=1 https://gitlab.com/STRK-ND/KryptoNite-Clang.git clang-llvm
-		
-                # Toolchain Directory defaults to clang-llvm
-		TC_DIR=$KERNEL_DIR/clang-llvm
+		msg "|| Cloning PROTON clang ||"
+		git clone --depth=1 https://github.com/kdrag0n/proton-clang clang
+
+		# Toolchain Directory defaults to clang
+		TC_DIR=$KERNEL_DIR/clang
 	fi
 
-	msg "|| Cloning Anykernel ||"
-	git clone --depth 1 --no-single-branch https://github.com/"$AUTHOR"/AnyKernel3.git
+	msg "|| Cloning Anykernel for X00T ||"
+	git clone --depth=1 https://github.com/Rombuilding-X00TD/AnyKernel3-master Anykernel3
 
 	if [ $BUILD_DTBO = 1 ]
 	then
@@ -223,12 +214,9 @@ exports() {
 
 	if [ $COMPILER = "clang" ]
 	then
+		echo 'Compiling with Clang !'
 		KBUILD_COMPILER_STRING=$("$TC_DIR"/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
 		PATH=$TC_DIR/bin/:$PATH
-	elif [ $COMPILER = "gcc" ]
-	then
-		KBUILD_COMPILER_STRING=$("$GCC64_DIR"/bin/aarch64-elf-gcc --version | head -n 1)
-		PATH=$GCC64_DIR/bin/:$GCC32_DIR/bin/:/usr/bin:$PATH
 	fi
 
 	BOT_MSG_URL="https://api.telegram.org/bot$token/sendMessage"
