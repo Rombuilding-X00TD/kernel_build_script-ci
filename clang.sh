@@ -190,7 +190,7 @@ clone() {
 	if [ $COMPILER = "clang" ]
 	then
 		msg "|| Cloning Clang-16||"
-		git clone --depth=1 https://gitlab.com/STRK-ND/KryptoNite-Clang.git clang-llvm
+		git clone --depth=1 https://gitlab.com/STRK-ND/KryptoNite-Clang.git clang
 
 		# Toolchain Directory defaults to clang
 		TC_DIR=$KERNEL_DIR/clang
