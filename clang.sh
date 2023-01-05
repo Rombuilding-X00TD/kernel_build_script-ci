@@ -196,8 +196,8 @@ clone() {
 		TC_DIR=$KERNEL_DIR/clang
 	fi
 
-	msg "|| Cloning Anykernel for X00T ||"
-	git clone --depth=1 https://github.com/Rombuilding-X00TD/AnyKernel3-master Anykernel3
+	msg "|| Cloning Anykernel ||"
+	git clone --depth 1 --no-single-branch https://github.com/STRK-ND/AnyKernel3.git
 
 	if [ $BUILD_DTBO = 1 ]
 	then
