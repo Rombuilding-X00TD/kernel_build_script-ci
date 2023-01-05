@@ -1,9 +1,8 @@
 #! /bin/bash
-# shellcheck disable=SC2154
 
  # Script For Building Android arm64 Kernel
  #
- # Copyright (c) 2018-2021 Panchajanya1999 <rsk52959@gmail.com>
+ # Copyright (c) 2018-2020 Panchajanya1999 <rsk52959@gmail.com>
  #
  # Licensed under the Apache License, Version 2.0 (the "License");
  # you may not use this file except in compliance with the License.
@@ -20,69 +19,63 @@
 
 #Kernel building script
 
-# Bail out if script fails
-set -e
-
 # Function to show an informational message
 msg() {
-	echo
-	echo -e "\e[1;32m$*\e[0m"
-	echo
+    echo -e "\e[1;32m$*\e[0m"
 }
 
 err() {
-	echo -e "\e[1;41m$*\e[0m"
-	exit 1
-}
-
-cdir() {
-	cd "$1" 2>/dev/null || \
-		err "The directory $1 doesn't exists !"
+    echo -e "\e[1;41m$*\e[0m"
+    exit 1
 }
 
 ##------------------------------------------------------##
 ##----------Basic Informations, COMPULSORY--------------##
 
 # The defult directory where the kernel should be placed
-KERNEL_DIR="$(pwd)"
-BASEDIR="$(basename "$KERNEL_DIR")"
+KERNEL_DIR=$PWD
 
 # The name of the Kernel, to name the ZIP
-ZIPNAME="Kryptonite"
+KERNEL="Kryptonite"
 
-# Build Author
-# Take care, it should be a universal and most probably, case-sensitive
-AUTHOR="STRK-ND"
-
-# Architecture
-ARCH=arm64
+# Kernel zip name type
+TYPE="Stable"
 
 # The name of the device for which the kernel is built
 MODEL="Max Pro M1"
 
-# Show manufacturer info
-MANUFACTURERINFO="ASUSTek Computer Inc."
-
-# Kernel revision
-KERNELTYPE=STOCK
-
 # The codename of the device
 DEVICE="X00TD"
+
+# Kernel revision
+KERNELTYPE=HMP
 
 # The defconfig which should be used. Get it from config.gz from
 # your device or check source
 DEFCONFIG=X00TD_defconfig
 
+# Show manufacturer info
+MANUFACTURERINFO="ASUSTek Computer Inc."
+
+# Kernel revision
+KERNELTYPE=HMP
+KERNELRELEASE=stable
+
+# List the kernel version of each device
+VERSION="GE"
+
+# Retrieves branch information
+CI_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+export CI_BRANCH
+
 # Specify compiler. 
-# 'clang' or 'gcc'
+# 'clang'
 COMPILER=clang
-
-# Build modules. 0 = NO | 1 = YES
-MODULES=0
-
-# Specify linker.
-# 'ld.lld'(default)
-LINKER=ld.lld
+	if [ $COMPILER = "clang" ]
+	then
+		# install few necessary packages
+		apt-get -y install llvm lld
+	fi
 
 # Clean source prior building. 1 is NO(default) | 0 is YES
 INCREMENTAL=1
@@ -98,39 +91,13 @@ PTTG=1
 # Generate a full DEFCONFIG prior building. 1 is YES | 0 is NO(default)
 DEF_REG=0
 
-# Files/artifacts
-FILES=Image.gz-dtb
-
 # Build dtbo.img (select this only if your source has support to building dtbo.img)
 # 1 is YES | 0 is NO(default)
 BUILD_DTBO=0
-	if [ $BUILD_DTBO = 1 ]
-	then 
-		# Set this to your dtbo path. 
-		# Defaults in folder out/arch/arm64/boot/dts
-		DTBO_PATH="xiaomi/violet-sm6150-overlay.dtbo"
-	fi
 
 # Sign the zipfile
 # 1 is YES | 0 is NO
-SIGN=1
-	if [ $SIGN = 1 ]
-	then
-		#Check for java
-		if command -v java > /dev/null 2>&1; then
-			SIGN=1
-		else
-			SIGN=0
-		fi
-	fi
-
-# Silence the compilation
-# 1 is YES(default) | 0 is NO
-SILENCE=0
-
-# Verbose build
-# 0 is Quiet(default)) | 1 is verbose | 2 gives reason for rebuilding targets
-VERBOSE=0
+SIGN=0
 
 # Debug purpose. Send logs on every successfull builds
 # 1 is YES | 0 is NO(default)
@@ -143,45 +110,36 @@ LOG_DEBUG=0
 # set KBUILD_BUILD_VERSION and KBUILD_BUILD_HOST and CI_BRANCH
 
 ## Set defaults first
-
-# shellcheck source=/etc/os-release
-DISTRO=$(source /etc/os-release && echo "${NAME}")
-KBUILD_BUILD_HOST=$(uname -a | awk '{print $2}')
-CI_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-TERM=xterm
-export KBUILD_BUILD_HOST CI_BRANCH TERM
+DISTRO=$(cat /etc/issue)
 export token="1719149477:AAFAPPtfNTHh_byVBhDZ_anDQD-ywukzWRc"
 
 ## Check for CI
-if [ "$CI" ]
+if [ -n "$CI" ]
 then
-	if [ "$CIRCLECI" ]
+	if [ -n "$CIRCLECI" ]
 	then
 		export KBUILD_BUILD_VERSION=$CIRCLE_BUILD_NUM
 		export KBUILD_BUILD_HOST="CircleCI"
 		export CI_BRANCH=$CIRCLE_BRANCH
 	fi
-	if [ "$DRONE" ]
+	if [ -n "$DRONE" ]
 	then
-		export KBUILD_BUILD_VERSION=$DRONE_BUILD_NUMBER
-		export KBUILD_BUILD_HOST=$DRONE_SYSTEM_HOST
+		export KBUILD_BUILD_VERSION="1"
+		export KBUILD_BUILD_HOST="DroneCI"
 		export CI_BRANCH=$DRONE_BRANCH
-		export BASEDIR=$DRONE_REPO_NAME # overriding
-		export SERVER_URL="${DRONE_SYSTEM_PROTO}://${DRONE_SYSTEM_HOSTNAME}/${AUTHOR}/${BASEDIR}/${KBUILD_BUILD_VERSION}"
 	else
 		echo "Not presetting Build Version"
 	fi
 fi
 
-#Check Kernel Version
+# Check Kernel Version
 KERVER=$(make kernelversion)
-
 
 # Set a commit head
 COMMIT_HEAD=$(git log --oneline -1)
 
 # Set Date 
-DATE=$(TZ=Asia/Kolkata date +"%Y%m%d-%T")
+DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
 
 # Now Its time for other stuffs like cloning, exporting, etc
 
@@ -189,14 +147,14 @@ clone() {
 	echo " "
 	if [ $COMPILER = "clang" ]
 	then
-		msg "|| Cloning Clang-16||"
+		msg "|| Cloning PROTON clang ||"
 		git clone --depth=1 https://gitlab.com/STRK-ND/KryptoNite-Clang.git clang
 
 		# Toolchain Directory defaults to clang
 		TC_DIR=$KERNEL_DIR/clang
 	fi
 
-	msg "|| Cloning Anykernel ||"
+	msg "|| Cloning Anykernel for X00T ||"
 	git clone --depth 1 --no-single-branch https://github.com/STRK-ND/AnyKernel3.git
 
 	if [ $BUILD_DTBO = 1 ]
@@ -209,8 +167,9 @@ clone() {
 ##------------------------------------------------------##
 
 exports() {
-	KBUILD_BUILD_USER=$AUTHOR
-	SUBARCH=$ARCH
+	export KBUILD_BUILD_USER="Rajat"
+	export ARCH=arm64
+	export SUBARCH=arm64
 
 	if [ $COMPILER = "clang" ]
 	then
@@ -219,19 +178,17 @@ exports() {
 		PATH=$TC_DIR/bin/:$PATH
 	fi
 
-	BOT_MSG_URL="https://api.telegram.org/bot$token/sendMessage"
-	BOT_BUILD_URL="https://api.telegram.org/bot$token/sendDocument"
+	export PATH KBUILD_COMPILER_STRING
+	export BOT_MSG_URL="https://api.telegram.org/bot$token/sendMessage"
+	export BOT_BUILD_URL="https://api.telegram.org/bot$token/sendDocument"
 	PROCS=$(nproc --all)
-
-	export KBUILD_BUILD_USER ARCH SUBARCH PATH \
-		KBUILD_COMPILER_STRING BOT_MSG_URL \
-		BOT_BUILD_URL PROCS
+	export PROCS
 }
 
 ##---------------------------------------------------------##
 
 tg_post_msg() {
-	curl -s -X POST "$BOT_MSG_URL" -d chat_id="$CHATID" \
+	curl -s -X POST "$BOT_MSG_URL" -d chat_id="$2" \
 	-d "disable_web_page_preview=true" \
 	-d "parse_mode=html" \
 	-d text="$1"
@@ -246,10 +203,29 @@ tg_post_build() {
 
 	#Show the Checksum alongwith caption
 	curl --progress-bar -F document=@"$1" "$BOT_BUILD_URL" \
-	-F chat_id="$CHATID"  \
+	-F chat_id="$2"  \
 	-F "disable_web_page_preview=true" \
-	-F "parse_mode=Markdown" \
-	-F caption="$2 | *MD5 Checksum : *\`$MD5CHECK\`"
+	-F "parse_mode=html" \
+	-F caption="$3 | <b>MD5 Checksum : </b><code>$MD5CHECK</code>"  
+}
+
+##----------------------------------------------------------##
+
+# Function to replace defconfig versioning
+setversioning() {
+if [[ "$CI_BRANCH" == "main" ]]; then
+    # For staging branch
+    KERNELNAME="$KERNEL-$DEVICE-$KERNELTYPE-$TYPE-$VERSION-$DATE"
+    # Export our new localversion and zipnames
+    export KERNELTYPE KERNELNAME
+    export ZIPNAME="$KERNELNAME.zip"
+else
+	# For staging branch
+    KERNELNAME="$KERNEL-$DEVICE-$KERNELTYPE-$TYPE-$VERSION1-$DATE"
+    # Export our new localversion and zipnames
+    export KERNELTYPE KERNELNAME
+    export ZIPNAME="$KERNELNAME.zip"
+fi
 }
 
 ##----------------------------------------------------------##
@@ -263,8 +239,10 @@ build_kernel() {
 
 	if [ "$PTTG" = 1 ]
  	then
-		tg_post_msg "<b>$KBUILD_BUILD_VERSION CI Build Triggered</b>%0A<b>Docker OS: </b><code>$DISTRO</code>%0A<b>Kernel Version : </b><code>$KERVER</code>%0A<b>Date : </b><code>$(TZ=Asia/Jakarta date)</code>%0A<b>Device : </b><code>$MODEL [$DEVICE]</code>%0A<b>Pipeline Host : </b><code>$KBUILD_BUILD_HOST</code>%0A<b>Host Core Count : </b><code>$PROCS</code>%0A<b>Compiler Used : </b><code>$KBUILD_COMPILER_STRING</code>%0A<b>Linker : </b><code>$LINKER</code>%0a<b>Branch : </b><code>$CI_BRANCH</code>%0A<b>Top Commit : </b><code>$COMMIT_HEAD</code>%0A<a href='$SERVER_URL'>Link</a>"
+		tg_post_msg "<b>Docker OS: </b><code>$DISTRO</code>%0A<b>Kernel Version : </b><code>$KERVER</code>%0A<b>Date : </b><code>$(TZ=Asia/Jakarta date)</code>%0A<b>Device : </b><code>$MODEL [$DEVICE]</code>%0A<b>Manufacturer : </b><code>$MANUFACTURERINFO</code>%0A<b>Pipeline Host : </b><code>$KBUILD_BUILD_HOST</code>%0A<b>Host Core Count : </b><code>$PROCS</code>%0A<b>Compiler Used : </b><code>$KBUILD_COMPILER_STRING</code>%0a<b>Branch : </b><code>$CI_BRANCH</code>%0A<b>Last Commit : </b><code>$COMMIT_HEAD</code>%0A" "$CHATID"
 	fi
+
+	msg "|| Started Compilation ||"
 
 	make O=out $DEFCONFIG
 	if [ $DEF_REG = 1 ]
@@ -272,124 +250,76 @@ build_kernel() {
 		cp .config arch/arm64/configs/$DEFCONFIG
 		git add arch/arm64/configs/$DEFCONFIG
 		git commit -m "$DEFCONFIG: Regenerate
-
-						This is an auto-generated commit"
+					This is an auto-generated commit"
 	fi
 
 	BUILD_START=$(date +"%s")
 	
 	if [ $COMPILER = "clang" ]
 	then
-		MAKE+=(
-			CROSS_COMPILE=aarch64-linux-gnu- \
-			CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-			CC=clang \
-			AR=llvm-ar \
-			OBJDUMP=llvm-objdump \
-			STRIP=llvm-strip \
-			NM=llvm-nm \
-			OBJCOPY=llvm-objcopy \
-			LD="$LINKER"
-		)
-	elif [ $COMPILER = "gcc" ]
-	then
-		MAKE+=(
-			CROSS_COMPILE_ARM32=arm-eabi- \
-			CROSS_COMPILE=aarch64-elf- \
-			AR=aarch64-elf-ar \
-			OBJDUMP=aarch64-elf-objdump \
-			STRIP=aarch64-elf-strip \
-			NM=aarch64-elf-nm \
-			OBJCOPY=aarch64-elf-objcopy 
-		)
-	fi
-	
-	if [ $SILENCE = "1" ]
-	then
-		MAKE+=( -s )
+		make -j"$PROCS" O=out \
+				CROSS_COMPILE=aarch64-linux-gnu- \
+				CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
+				CC=clang \
+				AR=llvm-ar \
+				OBJDUMP=llvm-objdump \
+				STRIP=llvm-strip
 	fi
 
-	msg "|| Started Compilation ||"
-	make -kj"$PROCS" O=out \
-		V=$VERBOSE \
-		"${MAKE[@]}" 2>&1 | tee error.log
-	if [ $MODULES = "1" ]
+
+	BUILD_END=$(date +"%s")
+	DIFF=$((BUILD_END - BUILD_START))
+
+	if [ -f "$KERNEL_DIR"/out/arch/arm64/boot/Image.gz-dtb ] 
 	then
-	    msg "|| Started Compiling Modules ||"
-	    make -j"$PROCS" O=out \
-		 "${MAKE[@]}" modules_prepare
-	    make -j"$PROCS" O=out \
-		 "${MAKE[@]}" modules INSTALL_MOD_PATH="$KERNEL_DIR"/out/modules
-	    make -j"$PROCS" O=out \
-		 "${MAKE[@]}" modules_install INSTALL_MOD_PATH="$KERNEL_DIR"/out/modules
-	    find "$KERNEL_DIR"/out/modules -type f -iname '*.ko' -exec cp {} AnyKernel3/modules/system/lib/modules/ \;
+		msg "|| Kernel successfully compiled ||"
+	elif ! [ -f $KERNEL_DIR/out/arch/arm64/boot/Image.gz-dtb ]
+	then
+		echo -e "Kernel compilation failed, See buildlog to fix errors"
+		tg_post_msg "<b>Build failed to compile after $((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds</b>" "$CHATID" 
+		exit 1
 	fi
 
-		BUILD_END=$(date +"%s")
-		DIFF=$((BUILD_END - BUILD_START))
-
-		if [ -f "$KERNEL_DIR"/out/arch/arm64/boot/$FILES ]
-		then
-			msg "|| Kernel successfully compiled ||"
-			if [ $BUILD_DTBO = 1 ]
-			then
-				msg "|| Building DTBO ||"
-				tg_post_msg "<code>Building DTBO..</code>"
-				python2 "$KERNEL_DIR/scripts/ufdt/libufdt/utils/src/mkdtboimg.py" \
-					create "$KERNEL_DIR/out/arch/arm64/boot/dtbo.img" --page_size=4096 "$KERNEL_DIR/out/arch/arm64/boot/dts/$DTBO_PATH"
-			fi
-				gen_zip
-			else
-			if [ "$PTTG" = 1 ]
- 			then
-				tg_post_build "error.log" "*Build failed to compile after $((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds*"
-			fi
-		fi
-	
+	if [ $BUILD_DTBO = 1 ]
+	then
+		msg "|| Building DTBO ||"
+		tg_post_msg "<code>Building DTBO..</code>" "$CHATID"
+		python2 "$KERNEL_DIR/scripts/ufdt/libufdt/utils/src/mkdtboimg.py" \
+			create "$KERNEL_DIR/out/arch/arm64/boot/dtbo.img" --page_size=4096 "$KERNEL_DIR/out/arch/arm64/boot/dts/qcom/sm6150-idp-overlay.dtbo"
+	fi
 }
 
 ##--------------------------------------------------------------##
 
 gen_zip() {
 	msg "|| Zipping into a flashable zip ||"
-	mv "$KERNEL_DIR"/out/arch/arm64/boot/$FILES AnyKernel3/$FILES
+	 cp "$KERNEL_DIR"/out/arch/arm64/boot/Image.gz-dtb Anykernel3/
 	if [ $BUILD_DTBO = 1 ]
 	then
-		mv "$KERNEL_DIR"/out/arch/arm64/boot/dtbo.img AnyKernel3/dtbo.img
+		cp "$KERNEL_DIR"/out/arch/arm64/boot/dtbo.img Anykernel3/
 	fi
-	cdir AnyKernel3
-	zip -r $ZIPNAME-$DEVICE-$KERNELTYPE-"$DATE" . -x ".git*" -x "README.md" -x "*.zip"
+	cd Anykernel3 || exit
+	zip -r9 "$ZIPNAME" * -x .git README.md
 
 	## Prepare a final zip variable
-	ZIP_FINAL="$ZIPNAME-$DEVICE-$KERNELTYPE-$DATE"
-
-	if [ $SIGN = 1 ]
-	then
-		## Sign the zip before sending it to telegram
-		if [ "$PTTG" = 1 ]
- 		then
- 			msg "|| Signing Zip ||"
-			tg_post_msg "<code>Signing Zip file with AOSP keys..</code>"
- 		fi
-		curl -sLo zipsigner-3.0.jar https://github.com/Magisk-Modules-Repo/zipsigner/raw/master/bin/zipsigner-3.0-dexed.jar
-		java -jar zipsigner-3.0.jar "$ZIP_FINAL".zip "$ZIP_FINAL"-signed.zip
-		ZIP_FINAL="$ZIP_FINAL-signed"
-	fi
+	ZIP_FINAL="$ZIPNAME"
 
 	if [ "$PTTG" = 1 ]
  	then
-		tg_post_build "$ZIP_FINAL.zip" "Build took : $((DIFF / 60)) minute(s) and $((DIFF % 60)) second(s)"
+		tg_post_build "$ZIP_FINAL" "$CHATID" "Build took : $((DIFF / 60)) minute(s) and $((DIFF % 60)) second(s)"
 	fi
 	cd ..
 }
 
+setversioning
 clone
 exports
 build_kernel
+gen_zip
 
 if [ $LOG_DEBUG = "1" ]
 then
 	tg_post_build "error.log" "$CHATID" "Debug Mode Logs"
 fi
 
-##----------------*****-----------------------------##
+##------------------------------------------------------------------##
