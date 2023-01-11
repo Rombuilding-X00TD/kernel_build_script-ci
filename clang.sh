@@ -199,7 +199,7 @@ DATE=$(TZ=Asia/Kolkata date +"%Y%m%d-%T")
 	if [ $COMPILER = "clang" ]
 	then
 		msg "|| Cloning Clang ||"
-		git clone --depth=1 https://gitlab.com/STRK-ND/KryptoNite-Clang.git clang
+		git clone --depth=1 https://gitlab.com/varunhardgamer/trb_clang.git clang
 		
 		# Toolchain Directory defaults to clang-llvm
 		TC_DIR=$KERNEL_DIR/clang
@@ -293,12 +293,14 @@ build_kernel() {
 	if [ $COMPILER = "clang" ]
 	then
 		MAKE+=(
-		       CROSS_COMPILE=aarch64-linux-gnu- \
-		       CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-		       CC=clang \
-		       AR=llvm-ar \
-		       OBJDUMP=llvm-objdump \
-		       STRIP=llvm-strip
+		      ARCH=arm64 \
+                      CC=clang \
+                      CROSS_COMPILE=aarch64-linux-gnu- \
+                      CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
+                      AR=llvm-ar \
+                      NM=llvm-nm \
+                      OBJDUMP=llvm-objdump \
+                      STRIP=llvm-strip
 		)
 	elif [ $COMPILER = "gcc" ]
 	then
