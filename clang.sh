@@ -82,8 +82,7 @@ MODULES=0
 
 # Specify linker.
 # 'ld.lld'(default)
-ld --version
-LINKER=ld
+LINKER=ld.lld
 
 # Clean source prior building. 1 is NO(default) | 0 is YES
 INCREMENTAL=1
@@ -200,7 +199,7 @@ DATE=$(TZ=Asia/Kolkata date +"%Y%m%d-%T")
 	if [ $COMPILER = "clang" ]
 	then
 		msg "|| Cloning Clang ||"
-		git clone --depth=1 https://gitlab.com/varunhardgamer/trb_clang.git clang
+		git clone --depth=1 https://gitlab.com/STRK-ND/clang-kryptonite.git clang
 		
 		# Toolchain Directory defaults to clang-llvm
 		TC_DIR=$KERNEL_DIR/clang
