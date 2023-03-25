@@ -297,15 +297,18 @@ build_kernel() {
 	if [ $COMPILER = "clang" ]
 	then
 		MAKE+=(
+		        ARCH=arm64 \
 			CROSS_COMPILE=aarch64-buildroot-linux-gnu- \
 			CROSS_COMPILE_ARM32=arm-buildroot-linux-gnueabihf- \
 			CLANG_TRIPLE=aarch64-buildroot-linux-gnu- \
-			CC=clang \
-			AR=llvm-ar \
-			OBJDUMP=llvm-objdump \
-			STRIP=llvm-strip \
-			NM=llvm-nm \
-			OBJCOPY=llvm-objcopy \
+		        AS=llvm-as \
+		        CC=clang \
+		        AR=llvm-ar \
+		        NM=llvm-nm \
+		        STRIP=llvm-strip \
+		        OBJCOPY=llvm-objcopy \
+		        OBJDUMP=llvm-objdump \
+			LD="$LINKER"
 			LD="$LINKER"
 		)
 	elif [ $COMPILER = "gcc" ]
