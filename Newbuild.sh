@@ -203,8 +203,8 @@ DATE=$(TZ=Asia/Jakarta date +"%Y%m%d")
 		git clone --depth=1 https://github.com/RyuujiX/SDClang -b 14 sdclang
 
   		msger -n "|| Cloning GCC 4.9 ||"
-		git clone --depth=1 https://github.com/Kneba/aarch64-linux-android-4.9 gcc64
-		git clone --depth=1 https://github.com/Kneba/arm-linux-androideabi-4.9 gcc32
+		git clone --depth=1 https://github.com/cbendot/gcc-aarch64.git gcc64
+		git clone --depth=1 https://github.com/cbendot/gcc-armv7.git gcc32
 
 		# Toolchain Directory defaults to sdclang
 		TC_DIR=$KERNEL_DIR/sdclang
