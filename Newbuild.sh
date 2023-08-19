@@ -200,7 +200,7 @@ DATE=$(TZ=Asia/Jakarta date +"%Y%m%d")
 	if [ $COMPILER = "sdclang" ]
 	then
 		msger -n "|| Cloning SDClang ||"
-		git clone --depth=1 https://github.com/RyuujiX/SDClang -b 14 sdclang
+		git clone --depth=1 https://github.com/ZyCromerZ/SDClang.git -b 14 sdclang
 
   		msger -n "|| Cloning GCC ||"
 		git clone --depth=1 https://github.com/ZyCromerZ/aarch64-zyc-linux-gnu.git -b 14 gcc64
