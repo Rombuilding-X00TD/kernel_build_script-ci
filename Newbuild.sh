@@ -203,8 +203,8 @@ DATE=$(TZ=Asia/Jakarta date +"%Y%m%d")
 		git clone --depth=1 https://github.com/ZyCromerZ/SDClang.git -b 14 sdclang
 
   		msger -n "|| Cloning GCC ||"
-		git clone --depth=1 https://github.com/cbendot/gcc-aarch64.git gcc64
-		git clone --depth=1 https://github.com/cbendot/gcc-armv7.git gcc32
+		git clone --depth=1 https://github.com/ZyCromerZ/aarch64-zyc-linux-gnu.git -b 14 gcc64
+		git clone --depth=1 https://github.com/ZyCromerZ/arm-zyc-linux-gnueabi.git -b 14 gcc32
 
 		# Toolchain Directory defaults to sdclang
 		TC_DIR=$KERNEL_DIR/sdclang
@@ -236,8 +236,7 @@ exports()
 		CLANG_VER="Snapdragon clang version 14.1.5"
 		KBUILD_COMPILER_STRING="$CLANG_VER X GCC "
 		PATH=$GCC64_DIR/bin/:$GCC32_DIR/bin/:/usr/bin:$PATH
-		ClangMoreStrings="AR=llvm-ar NM=llvm-nm AS=llvm-as STRIP=llvm-strip OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump READELF=llvm-readelf HOSTAR=llvm-ar HOSTAS=llvm-as LD_LIBRARY_PATH=$TC_DIR/lib LD=ld.lld HOSTLD=ld.lld"
-	elif [ $COMPILER = "gcc" ]
+ClangMoreStrings="AR=llvm-ar NM=llvm-nm AS=llvm-as STRIP=llvm-strip OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump READELF=llvm-readelf HOSTAR=llvm-ar HOSTAS=llvm-as LD_LIBRARY_PATH=$clangDir/lib LLVM=1 LLVM_IAS=1 LD=ld.lld HOSTLD=ld.lld"	elif [ $COMPILER = "gcc" ]
 	then
 		KBUILD_COMPILER_STRING=$("$GCC64_DIR"/bin/aarch64-linux-android-gcc --version | head -n 1)
 		PATH=$GCC64_DIR/bin/:$GCC32_DIR/bin/:/usr/bin:$PATH
@@ -306,12 +305,13 @@ build_kernel()
 	if [ $COMPILER = "sdclang" ]
 	then
 		MAKE+=(
-			CROSS_COMPILE=aarch64-buildroot-linux-gnu- \
-			CROSS_COMPILE_ARM32=arm-buildroot-linux-gnueabihf- \
-			CLANG_TRIPLE=aarch64-buildroot-linux-gnu- \
-			CC=clang \
-			HOSTCC=gcc \
-			HOSTCXX=g++ ${ClangMoreStrings}
+		        ARCH=arm64 \
+				CC=clang \
+			    CROSS_COMPILE=aarch64-zyc-linux-gnu- \
+			    CROSS_COMPILE_ARM32=arm-zyc-linux-gnueabi- \
+			    CLANG_TRIPLE=aarch64-zyc-linux-gnu- \
+				HOSTCC=gcc \
+				HOSTCXX=g++ ${ClangMoreStrings}
 		)
 	elif [ $COMPILER = "gcc" ]
 	then
