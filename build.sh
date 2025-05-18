@@ -150,7 +150,7 @@ KBUILD_BUILD_HOST=$(uname -a | awk '{print $2}')
 CI_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 TERM=xterm
 export KBUILD_BUILD_HOST CI_BRANCH TERM
-export token="1719149477:AAFAPPtfNTHh_byVBhDZ_anDQD-ywukzWRc"
+export token="8031359096:AAHikV1HrlCZtpeKD9peGBxXlWG5rUIG3II"
 
 ## Check for CI
 if [ "$CI" ]
